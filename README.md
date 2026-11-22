@@ -1,7 +1,7 @@
 # Concesionaria Multimarcas — TFI Programación II (UTN FRRe)
 
 Sistema de gestión de stock para una concesionaria de automóviles, camionetas y motocicletas,
-desarrollado con Java 17+ y Programación Orientada a Objetos.
+desarrollado con Java 8+ y Programación Orientada a Objetos (compila con JDK 8, 17 o superior).
 
 ## Arquitectura
 
@@ -50,7 +50,7 @@ identificador;tipo;marca;modelo;año;color;kilometraje;precioBase;condicion;deta
 
 ## Compilación y ejecución
 
-Requiere **JDK 17 o superior**.
+Requiere **JDK 8 o superior** (probado con el JDK 8 de la máquina; también funciona en JDK 17+).
 
 ```powershell
 javac -encoding UTF-8 -d out (Get-ChildItem src -Recurse -Filter *.java).FullName

@@ -85,7 +85,7 @@ public class VehiculoArchivoDAO implements RepositorioGenerico<Vehiculo, String>
      */
     public VehiculoArchivoDAO(String rutaArchivo) {
         // Se aplica un valor por defecto para mantener el constructor nulo-seguro.
-        this.rutaArchivo = (rutaArchivo == null || rutaArchivo.isBlank())
+        this.rutaArchivo = (rutaArchivo == null || rutaArchivo.trim().isEmpty())
                 ? ARCHIVO_PREDETERMINADO : rutaArchivo;
     }
 
@@ -161,7 +161,7 @@ public class VehiculoArchivoDAO implements RepositorioGenerico<Vehiculo, String>
             int numeroLinea = 0;
             while ((linea = reader.readLine()) != null) {
                 numeroLinea++;
-                if (linea.isBlank()) {
+                if (linea.trim().isEmpty()) {
                     continue; // Se ignoran lineas en blanco dejadas por ediciones manuales.
                 }
                 try {
@@ -234,7 +234,7 @@ public class VehiculoArchivoDAO implements RepositorioGenerico<Vehiculo, String>
      */
     @Override
     public boolean existe(String id) throws IOException, DatoInvalidoException {
-        if (id == null || id.isBlank()) {
+        if (id == null || id.trim().isEmpty()) {
             return false;
         }
         // anyMatch corta la lectura en cuanto encuentra la primera coincidencia.
@@ -254,7 +254,7 @@ public class VehiculoArchivoDAO implements RepositorioGenerico<Vehiculo, String>
             throw new DatoInvalidoException("No se puede serializar un vehiculo nulo.");
         }
         String identificador = this.aTexto(vehiculo.getIdentificador());
-        if (identificador.isBlank()) {
+        if (identificador.trim().isEmpty()) {
             throw new DatoInvalidoException("El identificador del vehiculo es obligatorio.");
         }
         String cilindrada = (vehiculo instanceof Motocicleta)
@@ -320,13 +320,17 @@ public class VehiculoArchivoDAO implements RepositorioGenerico<Vehiculo, String>
      * @throws DatoInvalidoException si el codigo de tipo no es reconocido
      */
     private Vehiculo crearVehiculo(String codigoTipo) throws DatoInvalidoException {
-        // El switch de Java 17 permite devolver directamente la instancia y lanzar si no existe.
-        return switch (codigoTipo) {
-            case CODIGO_AUTOMOVIL -> new Automovil();
-            case CODIGO_CAMIONETA -> new Camioneta();
-            case CODIGO_MOTOCICLETA -> new Motocicleta();
-            default -> throw new DatoInvalidoException("Codigo de tipo desconocido: " + codigoTipo);
-        };
+        // Se usa switch clásico para mantener compatibilidad con Java 8.
+        switch (codigoTipo) {
+            case CODIGO_AUTOMOVIL:
+                return new Automovil();
+            case CODIGO_CAMIONETA:
+                return new Camioneta();
+            case CODIGO_MOTOCICLETA:
+                return new Motocicleta();
+            default:
+                throw new DatoInvalidoException("Codigo de tipo desconocido: " + codigoTipo);
+        }
     }
 
     /**
