@@ -16,43 +16,21 @@ import com.concesionaria.modelo.excepciones.VehiculoDuplicadoException;
 import com.concesionaria.modelo.excepciones.VehiculoNoEncontradoException;
 import com.concesionaria.servicio.ConcesionariaService;
 
-/**
- * Interfaz de consola de la concesionaria.
- * <p>
- * Ofrece altas, bajas, modificaciones, busquedas, listado general y reportes
- * para directivos. Solo se comunica con {@link ConcesionariaService}: no accede
- * a la capa de persistencia ni implementa reglas de negocio. Todo mensaje de error
- * se obtiene de las excepciones que lanza el servicio.
- * </p>
- *
- * @author Desarrollo TFI - Programacion II
- * @version 1.0
- */
 public class MenuConsola {
 
-    /** Opciones de tipo de vehiculo exclusivas de esta pantalla. */
     private enum OpcionVehiculo {
-        /** Alta de un automovil. */
+
         AUTOMOVIL,
-        /** Alta de una camioneta. */
+
         CAMIONETA,
-        /** Alta de una motocicleta. */
+
         MOTOCICLETA
     }
 
-    /** Servicio con el que se comunica esta vista. */
     private final ConcesionariaService servicio;
 
-    /** Utilidad de lectura por consola. */
     private final ConsolaHelper entrada;
 
-    /**
-     * Crea el menu de consola con sus dependencias ya inicializadas.
-     *
-     * @param servicio servicio de negocio a utilizar; no puede ser nulo
-     * @param entrada  helper de entrada por consola; no puede ser nulo
-     * @throws IllegalArgumentException si alguna dependencia es nula
-     */
     public MenuConsola(ConcesionariaService servicio, ConsolaHelper entrada) {
         if (servicio == null || entrada == null) {
             throw new IllegalArgumentException("El servicio y el helper de consola son obligatorios.");
@@ -61,10 +39,6 @@ public class MenuConsola {
         this.entrada = entrada;
     }
 
-    /**
-     * Inicia el ciclo de vida del menu: carga el stock y atiende las opciones
-     * del usuario hasta que elige salir.
-     */
     public void iniciar() {
         this.cargarStockInicial();
         Boolean salir = Boolean.FALSE;
@@ -100,7 +74,7 @@ public class MenuConsola {
                 }
             } catch (DatoInvalidoException | VehiculoDuplicadoException
                     | VehiculoNoEncontradoException | IOException e) {
-                // La vista solo informa el mensaje; la decision vino del servicio.
+
                 System.out.println("Error: " + e.getMessage());
             }
             if (!salir.booleanValue()) {
@@ -111,9 +85,6 @@ public class MenuConsola {
         this.entrada.cerrar();
     }
 
-    /**
-     * Muestra el menu principal con todas las operaciones disponibles.
-     */
     private void mostrarMenuPrincipal() {
         System.out.println();
         System.out.println("===== CONCESIONARIA MULTIMARCAS =====");
@@ -126,9 +97,6 @@ public class MenuConsola {
         System.out.println("0) Salir");
     }
 
-    /**
-     * Carga el stock desde la capa de servicio al iniciar la aplicacion.
-     */
     private void cargarStockInicial() {
         try {
             this.servicio.cargarStock();
@@ -138,13 +106,6 @@ public class MenuConsola {
         }
     }
 
-    /**
-     * Solicita los datos de un vehiculo nuevo y lo da de alta.
-     *
-     * @throws IOException                si el servicio no puede persistir el alta
-     * @throws DatoInvalidoException      si el usuario ingresa datos que violan las reglas de negocio
-     * @throws VehiculoDuplicadoException si el identificador ya existe
-     */
     private void darAlta() throws IOException, DatoInvalidoException, VehiculoDuplicadoException {
         System.out.println("--- ALTA DE VEHICULO ---");
         Vehiculo vehiculo = this.solicitarVehiculo(null);
@@ -152,13 +113,6 @@ public class MenuConsola {
         System.out.println("Vehiculo registrado correctamente: " + vehiculo.getIdentificador());
     }
 
-    /**
-     * Solicita un identificador, muestra el vehiculo y pide confirmacion para borrarlo.
-     *
-     * @throws IOException                  si el servicio no puede persistir la baja
-     * @throws DatoInvalidoException        si el identificador esta vacio
-     * @throws VehiculoNoEncontradoException si el identificador no existe
-     */
     private void darBaja()
             throws IOException, DatoInvalidoException, VehiculoNoEncontradoException {
         System.out.println("--- BAJA DE VEHICULO ---");
@@ -173,13 +127,6 @@ public class MenuConsola {
         }
     }
 
-    /**
-     * Busca un vehiculo, muestra sus datos y solicita los nuevos valores.
-     *
-     * @throws IOException                  si el servicio no puede persistir la modificacion
-     * @throws DatoInvalidoException        si los nuevos datos violan las reglas de negocio
-     * @throws VehiculoNoEncontradoException si el identificador no existe
-     */
     private void modificar()
             throws IOException, DatoInvalidoException, VehiculoNoEncontradoException {
         System.out.println("--- MODIFICACION DE VEHICULO ---");
@@ -191,31 +138,17 @@ public class MenuConsola {
         System.out.println("Vehiculo modificado correctamente.");
     }
 
-    /**
-     * Busca y muestra un vehiculo por su identificador unico.
-     *
-     * @throws DatoInvalidoException        si el identificador esta vacio
-     * @throws VehiculoNoEncontradoException si el identificador no existe
-     */
     private void buscar() throws DatoInvalidoException, VehiculoNoEncontradoException {
         System.out.println("--- BUSQUEDA POR IDENTIFICADOR ---");
         String identificador = this.entrada.leerTexto("Identificador a buscar: ");
         this.mostrarVehiculo(this.servicio.buscarPorId(identificador));
     }
 
-    /**
-     * Muestra todos los vehiculos registrados en el inventario.
-     */
     private void listarGeneral() {
         System.out.println("--- LISTADO GENERAL ---");
         this.mostrarListado(this.servicio.listarTodos());
     }
 
-    /**
-     * Muestra el submenu de reportes y aplica el filtro elegido.
-     *
-     * @throws DatoInvalidoException si los parametros del filtro son inconsistentes
-     */
     private void mostrarReportes() throws DatoInvalidoException {
         System.out.println();
         System.out.println("--- REPORTES Y FILTROS ---");
@@ -267,11 +200,6 @@ public class MenuConsola {
         }
     }
 
-    /**
-     * Compone un filtro combinado; ENTER en un campo significa "no filtrar".
-     *
-     * @throws DatoInvalidoException si el rango de anios indicado es inconsistente
-     */
     private void mostrarFiltroCombinado() throws DatoInvalidoException {
         String marca = this.entrada.leerTextoOpcional("Marca (ENTER para todos): ");
         String categoria = this.entrada.leerTextoOpcional("Tipo (ENTER para todos): ");
@@ -285,9 +213,6 @@ public class MenuConsola {
                 desde.intValue() == 0 ? null : desde, hasta.intValue() == 0 ? null : hasta));
     }
 
-    /**
-     * Muestra el resultado del reporte de cantidades por condicion.
-     */
     private void mostrarConteoPorCondicion() {
         Map<CondicionVehiculo, Long> conteo = this.servicio.contarPorCondicion();
         for (Map.Entry<CondicionVehiculo, Long> entrada : conteo.entrySet()) {
@@ -295,12 +220,6 @@ public class MenuConsola {
         }
     }
 
-    /**
-     * Solicita todos los datos necesarios para construir un vehiculo.
-     *
-     * @param identificador identificador ya conocido, o {@code null} si debe pedirse al usuario
-     * @return vehiculo nuevo armado segun la subclase elegida
-     */
     private Vehiculo solicitarVehiculo(String identificador) {
         OpcionVehiculo opcion = this.entrada.leerEnum("Tipo de vehiculo: ", OpcionVehiculo.class);
         String id = (identificador == null)
@@ -331,12 +250,6 @@ public class MenuConsola {
         }
     }
 
-    /**
-     * Solicita los nuevos datos de un vehiculo existente, conservando su tipo y su identificador.
-     *
-     * @param original vehiculo que se esta modificando
-     * @return nueva instancia con los datos actualizados
-     */
     private Vehiculo solicitarModificacion(Vehiculo original) {
         String id = original.getIdentificador();
         String marca = this.entrada.leerTexto("Marca (" + original.getMarca() + "): ");
@@ -365,11 +278,6 @@ public class MenuConsola {
         throw new IllegalStateException("Tipo de vehiculo no contemplado en la modificacion.");
     }
 
-    /**
-     * Muestra el detalle completo de un vehiculo, incluyendo precio final y service.
-     *
-     * @param vehiculo vehiculo a mostrar
-     */
     private void mostrarVehiculo(Vehiculo vehiculo) {
         System.out.println(vehiculo);
         System.out.println("Categoria: " + vehiculo.getCategoria());
@@ -379,11 +287,6 @@ public class MenuConsola {
                 + (Boolean.TRUE.equals(vehiculo.requiereService()) ? "SI" : "NO"));
     }
 
-    /**
-     * Muestra una lista resumida de vehiculos.
-     *
-     * @param vehiculos lista a mostrar; puede estar vacia
-     */
     private void mostrarListado(List<Vehiculo> vehiculos) {
         if (vehiculos.isEmpty()) {
             System.out.println("No se encontraron vehiculos para los criterios indicados.");
